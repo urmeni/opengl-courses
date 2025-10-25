@@ -1,0 +1,24 @@
+// Clear color  & viewport #########################################
+// When your GPU renders, it draws into a rectangular region of memory called a framebuffer.
+// By default, GLFW gives you a window framebuffer (back buffer).
+// When you call glfwSwapBuffers(), the back buffer becomes visible.
+
+// glClearColor — setting the background color
+>> void glClearColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+// Values are floats between 0.0f and 1.0f.
+
+// glClear — clearing the buffer
+>> void glClear(GLbitfield mask);
+// Common masks:
+  GL_COLOR_BUFFER_BIT — clear color buffer (background).
+  GL_DEPTH_BUFFER_BIT — clear depth buffer (used with 3D).
+  GL_STENCIL_BUFFER_BIT — clear stencil buffer.
+// Combined by | >> glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+// glViewport — mapping your drawing to the window
+>> void glViewport(GLint x, GLint y, GLsizei width, GLsizei height);
+>> glViewport(0, 0, windowWidth, windowHeight); // means “draw across the whole window”.
+
+
+
+// #########################
