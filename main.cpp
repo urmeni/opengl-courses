@@ -6,25 +6,34 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <vector>
 #include <Camera.h>
 #include <Mesh.h>
 #include <ShaderProgram.h>
 #include <Texture2D.h>
 
 // --- GLOBAL VARIABLES ---
-const char* APP_TITLE = "Ma Scene OpenGL - Etape 3";
+const char* APP_TITLE = "Ma Scene Finale";
 int gWindowWidth = 1024;
 int gWindowHeight = 768;
 GLFWwindow * gWindow = nullptr;
 bool gWireframe = false;
 
 // Background Color
-glm::vec4 gClearColor(0.1f, 0.1f, 0.2f, 1.0f); // Dark blue
+glm::vec4 gClearColor(0.1f, 0.1f, 0.1f, 1.0f); // Dark blue
 
 // Camera Configuration
 FPSCamera fpsCamera(glm::vec3(0.0f, 2.0f, 10.0f));
 const float MOVE_SPEED = 5.0f;
 const float MOUSE_SENSITIVITY = 0.1f;
+
+// Scene Configuration
+const int numModels = 25;
+Mesh mesh[numModels];
+Texture2D texture[numModels];
+glm::vec3 modelPos[numModels];
+glm::vec3 modelScale[numModels];
+
 
 // --- PROTOTYPES ---
 bool initOpenGL();
@@ -45,22 +54,134 @@ int main() {
         return -1;
     }
 
-    // --- LOADING MESHES ---
-    Mesh cubeMesh;
-    if (!cubeMesh.loadOBJ("models/woodcrate.obj")) {
-        std::cerr << "Erreur chargement OBJ !" << std::endl;
-        // Keep up without crashing
-    }
+    // --- LOADING ASSETS ---
+    // OBJ 0 : Ground
+    mesh[0].loadOBJ("models/ground.obj");
+    texture[0].loadTexture("textures/ground.png", true);
+    modelPos[0] = glm::vec3(0.0f, 0.0f, 0.0f);
+    modelScale[0] = glm::vec3(0.15f, 0.15f, 0.15f);
 
-    Mesh floorMesh;
-    if (!floorMesh.loadOBJ("models/floor.obj")) {std::cerr << "Erreur chargement OBJ !" << std::endl;}
+    // OBJ 1 : Bags
+    mesh[1].loadOBJ("models/bags.obj");
+    texture[1].loadTexture("textures/bags.png", true);
+    modelPos[1] = glm::vec3(2.0f, 0.0f, -2.5f);
+    modelScale[1] = glm::vec3(0.5f, 0.5f, 0.5f);
 
-    // --- LOADING TEXTURES ---
-    Texture2D cubeTexture;
-    cubeTexture.loadTexture("textures/woodcrate_diffuse.jpg", true);
+    // OBJ 2 : Barrel
+    mesh[2].loadOBJ("models/fire_barrel.obj");
+    texture[2].loadTexture("textures/fire_barrel.png", true);
+    modelPos[2] = glm::vec3(0.0f, 0.0f, 2.0f);
+    modelScale[2] = glm::vec3(1.0f, 1.0f, 1.0f);
 
-    Texture2D floorTexture;
-    floorTexture.loadTexture("textures/tile_floor.jpg", true);
+    // OBJ 3 : Mattress
+    mesh[3].loadOBJ("models/mattress.obj");
+    texture[3].loadTexture("textures/mattress.png", true);
+    modelPos[3] = glm::vec3(2.0f, 0.0f, 0.0f);
+    modelScale[3] = glm::vec3(1.0f, 1.0f, 1.0f);
+
+    // OBJ 4 : Pirozhok
+    mesh[4].loadOBJ("models/pirozhok.obj");
+    texture[4].loadTexture("textures/pirozhok.png", true);
+    modelPos[4] = glm::vec3(-3.0f, 0.0f, 0.0f);
+    modelScale[4] = glm::vec3(0.04f, 0.04f, 0.04f);
+
+    // OBJ 5 : Mattress
+    mesh[5].loadOBJ("models/mattress.obj");
+    texture[5].loadTexture("textures/mattress.png", true);
+    modelPos[5] = glm::vec3(2.0f, 0.0f, 4.0f);
+    modelScale[5] = glm::vec3(1.0f, 1.0f, 1.0f);
+
+    // OBJ 6 : Pirozhok
+    mesh[6].loadOBJ("models/pirozhok.obj");
+    texture[6].loadTexture("textures/pirozhok.png", true);
+    modelPos[6] = glm::vec3(0.0f, 5.0f, -4.0f);
+    modelScale[6] = glm::vec3(0.04f, 0.04f, 0.04f);
+
+    // OBJ 7 : Bags
+    mesh[7].loadOBJ("models/bags.obj");
+    texture[7].loadTexture("textures/bags.png", true);
+    modelPos[7] = glm::vec3(-4.0f, 0.0f, 1.0f);
+    modelScale[7] = glm::vec3(0.4f, 0.4f, 0.4f);
+
+
+
+
+    // OBJ 8 : Fences back
+    mesh[8].loadOBJ("models/fence.obj");
+    texture[8].loadTexture("textures/fence.png", true);
+    modelPos[8] = glm::vec3(12.0f, 2.0f, 1.0f);
+    modelScale[8] = glm::vec3(1.0f, 1.0f, 1.0f);
+
+
+    // OBJ 9 : Fence front
+    mesh[9].loadOBJ("models/fence.obj");
+    texture[9].loadTexture("textures/fence.png", true);
+    modelPos[9] = glm::vec3(-12.0f, 2.0f, -6.0f);
+    modelScale[9] = glm::vec3(1.0f, 1.0f, 1.0f);
+
+
+    // OBJ 10 : Fences front
+    mesh[10].loadOBJ("models/fence.obj");
+    texture[10].loadTexture("textures/fence.png", true);
+    modelPos[10] = glm::vec3(-11.0f, 1.8f, 4.0f);
+    modelScale[10] = glm::vec3(1.0f, 1.0f, 1.0f);
+
+    // OBJ 11 : Fences back
+    mesh[11].loadOBJ("models/fence.obj");
+    texture[11].loadTexture("textures/fence.png", true);
+    modelPos[11] = glm::vec3(13.0f, 2.0f, -10.0f);
+    modelScale[11] = glm::vec3(1.0f, 1.0f, 1.0f);
+
+    // OBJ 12 : Fences back
+    mesh[12].loadOBJ("models/fence.obj");
+    texture[12].loadTexture("textures/fence.png", true);
+    modelPos[12] = glm::vec3(12.75f, 2.0f, 10.0f);
+    modelScale[12] = glm::vec3(1.0f, 1.0f, 1.0f);
+
+    // OBJ 13 : Fences front
+    mesh[13].loadOBJ("models/fence.obj");
+    texture[13].loadTexture("textures/fence.png", true);
+    modelPos[13] = glm::vec3(-11.75f, 1.8f, 12.5f);
+    modelScale[13] = glm::vec3(1.0f, 1.0f, 1.0f);
+
+    // OBJ 14 : Sign
+    mesh[14].loadOBJ("models/sign.obj");
+    texture[14].loadTexture("textures/sign.png", true);
+    modelPos[14] = glm::vec3(2.0f, 0.0f, 2.0f);
+    modelScale[14] = glm::vec3(1.0f, 1.0f, 1.0f);
+
+    // OBJ 15 : Buildings
+    mesh[15].loadOBJ("models/building.obj");
+    texture[15].loadTexture("textures/building.png", true);
+    modelPos[15] = glm::vec3(-30.0f, 0.0f, 2.0f);
+    modelScale[15] = glm::vec3(1.0f, 1.0f, 1.0f);
+
+    // OBJ 16 : Buildings
+    mesh[16].loadOBJ("models/building.obj");
+    texture[16].loadTexture("textures/building.png", true);
+    modelPos[16] = glm::vec3(30.0f, 0.0f, -40.0f);
+    modelScale[16] = glm::vec3(1.0f, 1.0f, 1.0f);
+
+    // OBJ 17 : Buildings
+    mesh[17].loadOBJ("models/building.obj");
+    texture[17].loadTexture("textures/building.png", true);
+    modelPos[17] = glm::vec3(0.0f, 0.0f, -30.0f);
+    modelScale[17] = glm::vec3(1.0f, 1.0f, 1.0f);
+
+    // OBJ 18 : ferris
+    mesh[18].loadOBJ("models/ferris.obj");
+    texture[18].loadTexture("textures/ferris.jpg", true);
+    modelPos[18] = glm::vec3(0.0f, 0.0f, 30.0f);
+    modelScale[18] = glm::vec3(10.0f, 10.0f, 10.0f);
+
+
+    // OBJ 19 : Energetic
+    mesh[19].loadOBJ("models/energetic.obj");
+    texture[19].loadTexture("textures/energetic.jpg", true);
+    modelPos[19] = glm::vec3(30.0f, 0.0f, 0.0f);
+    modelScale[19] = glm::vec3(11.0f, 11.0f, 11.0f);
+
+
 
     double lastTime = glfwGetTime();
 
@@ -103,47 +224,70 @@ int main() {
         // Uniforms of Lighting Directional
         lightingShader.setUniform("viewPos", fpsCamera.getPosition());
 
-        // Properties of directional lighting
-        lightingShader.setUniform("dirLight.direction", glm::vec3(0.0f, -1.0f, 1.0f)); // Comming from the top and back
-        lightingShader.setUniform("dirLight.ambient",   glm::vec3(0.1f, 0.1f, 0.1f));   // stale lighting everywhere
+        // Properties of directional lighting (SUN)
+        lightingShader.setUniform("dirLight.direction", glm::vec3(0.0f, -1.0f, -1.0f)); // Comming from the top and back
+        lightingShader.setUniform("dirLight.ambient",   glm::vec3(0.001f, 0.001f, 0.001f));   // stale lighting everywhere
         lightingShader.setUniform("dirLight.diffuse",   glm::vec3(0.9f, 0.9f, 0.9f));   // Shiny colour
         lightingShader.setUniform("dirLight.specular",  glm::vec3(1.0f, 1.0f, 1.0f));   // Reflects in pure white
 
-        // Material Properties
-        lightingShader.setUniform("material.ambient",   glm::vec3(1.0f, 1.0f, 1.0f)); // White to let the ambient transperse
-        lightingShader.setUniform("material.specular",  glm::vec3(0.7f, 0.7f, 0.7f)); // Force reflection
-        lightingShader.setUniform("material.shininess", 64.0f);
+        // --- CONFIGURATION PIROZHOK 6 LIGHT (Point Light) ---
+        lightingShader.setUniform("pointLight.position", modelPos[6]);
 
-        // -- Floor Rendering --
-        // Matrix model of the floor placed at y=0 and scaled up to 10x
-        glm::mat4 floorModel = glm::mat4(1.0f);
-        floorModel = glm::scale(floorModel, glm::vec3(10.0f, 1.0f, 10.0f));
+        lightingShader.setUniform("pointLight.ambient",  glm::vec3(2.0f, 2.0f, 2.0f)); // Faible lueur jaune
+        lightingShader.setUniform("pointLight.diffuse",  glm::vec3(1.0f, 0.8f, 0.6f)); // Éclairage chaud fort
+        lightingShader.setUniform("pointLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-        lightingShader.setUniform("model", floorModel); // Sending the Model to shader
+        // Atténuation 50 unit distance
+        lightingShader.setUniform("pointLight.constant",  1.0f);
+        lightingShader.setUniform("pointLight.linear",    0.09f);
+        lightingShader.setUniform("pointLight.quadratic", 0.032f);
 
-        // Floor Material and Texture
-        lightingShader.setUniformSampler("material.diffuseMap", 0);
-        floorTexture.bind(0);
+        // -- Drawing Loop --
+        for (int i = 0; i < numModels; i++)
+        {
+            // Calculating model Matrix for given object
+            glm::mat4 model = glm::mat4(1.0f);
 
-        floorMesh.draw(); // Drawing the floor
+            // Position
+            model = glm::translate(model, modelPos[i]);
 
-        // -- Cube Rendering --
-        // Matrix Model of the Cube : placed right above the ground at y=1.0f
-        glm::mat4 cubeModel = glm::mat4(1.0f);
-        cubeModel = glm::translate(cubeModel, glm::vec3(0.0f, 1.0f, 0.0f));
-        // Rotation
-        cubeModel = glm::rotate(cubeModel, (float)glfwGetTime() * 0.5f, glm::vec3(0.5f, 1.0f, 0.0f));
+            // Rotation simple animation for pirozhok
+            if (i == 6) {
+                model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.3f, 1.0f, 0.7f));
+                lightingShader.setUniform("material.ambient", glm::vec3(2.0f, 2.0f, 2.0f));
+                lightingShader.setUniform("material.specular", glm::vec3(0.0f, 0.0f, 0.0f));
+            } else {
+                // Pour tous les autres objets, comportement normal
+                lightingShader.setUniform("material.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+            }
 
-        lightingShader.setUniform("model", cubeModel); // Sending the model to shader
+            // scaling
+            model = glm::scale(model, modelScale[i]);
 
-        // Cube Material and Texture
-        cubeTexture.bind(0); // Unit 0 is used but with cube Texture
-        // no need to redo setUniformSampler if using the same slot 0)
+            lightingShader.setUniform("model", model);
 
-        cubeMesh.draw(); // Drawing the cube
+
+            // If the floor (i==0), makes it less shiny
+            if (i == 0) {
+                lightingShader.setUniform("material.specular", glm::vec3(0.6f, 0.6f, 0.6f));
+                lightingShader.setUniform("material.shininess", 30.0f);
+            } else {
+                lightingShader.setUniform("material.specular", glm::vec3(0.6f, 0.6f, 0.6f));
+                lightingShader.setUniform("material.shininess", 32.0f);
+            }
+
+            // Texture
+            lightingShader.setUniformSampler("material.diffuseMap", 0);
+            texture[i].bind(0);
+
+            // Draw
+            mesh[i].draw();
+            texture[i].unbind(0);
+        }
+
 
         // Unbinding
-        floorTexture.unbind(0);
+        texture[0].unbind(0);
         glUseProgram(0);
 
         // Swap buffers
